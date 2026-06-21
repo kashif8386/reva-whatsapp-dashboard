@@ -1,0 +1,399 @@
+:root {
+  --reva-accent: #ff634e;
+  --reva-black: #0a0a0a;
+  --reva-bg: #fbfaf8;
+  --reva-border: #ececec;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+}
+
+.reva-app {
+  height: 100vh;
+  display: flex;
+  background: #fafafa;
+  color: #111;
+}
+
+/* ---- Sidebar ---- */
+
+.reva-sidebar-wrap {
+  width: 360px;
+  min-width: 360px;
+  border-right: 1px solid var(--reva-border);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.reva-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.reva-sidebar-header {
+  padding: 18px 20px 14px;
+  background: var(--reva-black);
+}
+
+.reva-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reva-brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--reva-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  font-size: 14px;
+}
+
+.reva-brand-name {
+  color: #fff;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.reva-brand-sub {
+  color: #9a9a9a;
+  font-size: 11.5px;
+}
+
+.reva-search-wrap {
+  padding: 12px 16px;
+}
+
+.reva-search {
+  position: relative;
+}
+
+.reva-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 10px;
+  color: #aaa;
+}
+
+.reva-search input {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  font-size: 13.5px;
+  outline: none;
+}
+
+.reva-search input:focus {
+  border-color: var(--reva-accent);
+}
+
+.reva-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.reva-list-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f3f3;
+}
+
+.reva-list-item:hover {
+  background: #fafafa;
+}
+
+.reva-list-item.active {
+  background: #fdf1ef;
+}
+
+.reva-list-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.reva-list-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.reva-list-item-name {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.reva-list-item-time {
+  font-size: 11px;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.reva-list-item-meta {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.reva-pill {
+  background: #f1efe8;
+  color: #444441;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.reva-takeover-tag {
+  font-size: 10.5px;
+  color: var(--reva-accent);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.reva-empty-state {
+  padding: 24px 20px;
+  color: #999;
+  font-size: 13px;
+  text-align: center;
+}
+
+.reva-error {
+  color: #c0392b;
+}
+
+/* ---- Thread ---- */
+
+.reva-thread-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.reva-thread {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.reva-thread-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+}
+
+.reva-thread-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--reva-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+}
+
+.reva-back-btn {
+  display: none;
+  cursor: pointer;
+}
+
+.reva-thread-header-info {
+  flex: 1;
+}
+
+.reva-thread-name {
+  font-weight: 500;
+  font-size: 14.5px;
+}
+
+.reva-thread-phone {
+  font-size: 12px;
+  color: #999;
+}
+
+.reva-takeover-btn {
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 13px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+}
+
+.reva-takeover-btn:hover {
+  background: #fafafa;
+}
+
+.reva-takeover-btn.active {
+  border-color: var(--reva-accent);
+  background: #fdf1ef;
+  color: var(--reva-accent);
+}
+
+.reva-thread-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  background: var(--reva-bg);
+}
+
+.reva-bubble-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.reva-bubble-row.from-customer {
+  align-items: flex-start;
+}
+
+.reva-bubble-row.from-us {
+  align-items: flex-end;
+}
+
+.reva-bubble-sender {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+  font-size: 11px;
+  color: #888;
+}
+
+.reva-bubble {
+  max-width: 78%;
+  padding: 9px 13px;
+  border-radius: 14px;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.bubble-customer {
+  background: #fff;
+  color: #111;
+  border: 1px solid #eee;
+}
+
+.bubble-ai {
+  background: #f3f3f3;
+  color: #111;
+  border: 1px solid #e6e6e6;
+}
+
+.bubble-client {
+  background: var(--reva-accent);
+  color: #fff;
+}
+
+.reva-bubble-time {
+  font-size: 10.5px;
+  color: #999;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.reva-check {
+  color: var(--reva-accent);
+}
+
+.reva-composer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--reva-border);
+  background: #fff;
+}
+
+.reva-composer-hint {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.reva-composer-row {
+  display: flex;
+  gap: 8px;
+}
+
+.reva-composer-row input {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 22px;
+  border: 1px solid #e2e2e2;
+  font-size: 14px;
+  outline: none;
+}
+
+.reva-composer-row input:focus {
+  border-color: var(--reva-accent);
+}
+
+.reva-send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--reva-accent);
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.reva-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reva-send-btn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 760px) {
+  .reva-sidebar-wrap {
+    width: 100%;
+    min-width: 100%;
+  }
+  .reva-sidebar-wrap.mobile-hidden {
+    display: none;
+  }
+  .reva-thread-wrap.mobile-hidden {
+    display: none;
+  }
+  .reva-back-btn {
+    display: block;
+  }
+}
