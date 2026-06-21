@@ -95,7 +95,7 @@ function mapLeadRecord(record) {
  * Fetch all messages linked to a given Lead record, sorted oldest to newest.
  */
 export async function fetchMessagesForLead(leadId) {
-  const filterFormula = `{Lead} = '${leadId}'`;
+  
   let records = [];
   let offset;
 
@@ -107,7 +107,7 @@ export async function fetchMessagesForLead(leadId) {
       pageSize: "100",
     });
     if (offset) params.set("offset", offset);
-
+const filterFormula = `SEARCH('${leadId}', ARRAYJOIN({Lead}))`;
     const data = await airtableFetch(`/${encodeURIComponent(MESSAGES_TABLE)}?${params.toString()}`);
     records = records.concat(data.records);
     offset = data.offset;
