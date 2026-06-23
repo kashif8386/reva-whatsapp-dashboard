@@ -2,53 +2,50 @@
 //
 // Thin wrapper around the Airtable REST API.
 // Reads config from environment variables — see .env.example.
-//
-// Docs: https://airtable.com/developers/web/api/introduction
 
 const TOKEN = import.meta.env.VITE_AIRTABLE_TOKEN;
 const BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID;
 const LEADS_TABLE = import.meta.env.VITE_AIRTABLE_LEADS_TABLE || "Leads";
 const MESSAGES_TABLE = import.meta.env.VITE_AIRTABLE_MESSAGES_TABLE || "Messages";
-
 const BASE_URL = `https://api.airtable.com/v0/${BASE_ID}`;
 
-function assertConfigured() {
+function getHeaders() {
+  return {
+    Authorization: `Bearer ${TOKEN}`,
+    "Content-Type": "application/json",
+  };
+}
+
+function checkConfig() {
   if (!TOKEN || !BASE_ID) {
     throw new Error(
-      "Airtable is not configured. Copy .env.example to .env and fill in VITE_AIRTABLE_TOKEN and VITE_AIRTABLE_BASE_ID."
+      "Airtable is not configured. Copy .env.example to .env and fill in your credentials."
     );
   }
 }
 
-async function airtableFetch(path, options = {}) {
-  assertConfigured();
-  const res = await fetch(`${BASE_URL}${path}`, {
+async function doFetch(path, options = {}) {
+  checkConfig();
+  const url = `${BASE_URL}${path}`;
+  const res = await fetch(url, {
     ...options,
     headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "Content-Type": "application/json",
+      ...getHeaders(),
       ...(options.headers || {}),
     },
   });
-
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`Airtable API error (${res.status}): ${body}`);
   }
-
   return res.json();
 }
 
 // ---- Leads ----
 
-/**
- * Fetch all Leads, sorted by Last Message At descending (most recent first).
- * Handles Airtable's pagination automatically.
- */
 export async function fetchLeads() {
   let records = [];
   let offset;
-
   do {
     const params = new URLSearchParams({
       "sort[0][field]": "Last Message At",
@@ -56,17 +53,15 @@ export async function fetchLeads() {
       pageSize: "100",
     });
     if (offset) params.set("offset", offset);
-
-    const data = await airtableFetch(`/${encodeURIComponent(LEADS_TABLE)}?${params.toString()}`);
+    const data = await doFetch(`/${encodeURIComponent(LEADS_TABLE)}?${params.toString()}`);
     records = records.concat(data.records);
     offset = data.offset;
   } while (offset);
-
   return records.map(mapLeadRecord);
 }
 
 export async function updateLead(leadId, fields) {
-  const data = await airtableFetch(`/${encodeURIComponent(LEADS_TABLE)}/${leadId}`, {
+  const data = await doFetch(`/${encodeURIComponent(LEADS_TABLE)}/${leadId}`, {
     method: "PATCH",
     body: JSON.stringify({ fields }),
   });
@@ -91,14 +86,11 @@ function mapLeadRecord(record) {
 
 // ---- Messages ----
 
-/**
- * Fetch all messages linked to a given Lead record, sorted oldest to newest.
- */
 export async function fetchMessagesForLead(leadId) {
-  
+  if (!leadId) return [];
+  const filterFormula = `SEARCH('${leadId}', ARRAYJOIN({Lead}))`;
   let records = [];
   let offset;
-
   do {
     const params = new URLSearchParams({
       filterByFormula: filterFormula,
@@ -107,12 +99,10 @@ export async function fetchMessagesForLead(leadId) {
       pageSize: "100",
     });
     if (offset) params.set("offset", offset);
-const filterFormula = `SEARCH('${leadId}', ARRAYJOIN({Lead}))`;
-    const data = await airtableFetch(`/${encodeURIComponent(MESSAGES_TABLE)}?${params.toString()}`);
+    const data = await doFetch(`/${encodeURIComponent(MESSAGES_TABLE)}?${params.toString()}`);
     records = records.concat(data.records);
     offset = data.offset;
   } while (offset);
-
   return records.map(mapMessageRecord);
 }
 
@@ -121,16 +111,11 @@ function mapMessageRecord(record) {
   return {
     id: record.id,
     text: f["Message Text"] || "",
-    sender: (f["Sender"] || "Customer").toLowerCase(), // "customer" | "ai agent" | "client"
+    sender: (f["Sender"] || "Customer").toLowerCase(),
     timestamp: f["Timestamp"] || null,
   };
 }
 
-/**
- * Send a manual reply: writes Pending Reply + Send Reply = true onto the Lead.
- * An n8n workflow (Airtable Trigger watching Send Reply) picks this up,
- * sends it via the WhatsApp API, logs it to Messages, then resets these fields.
- */
 export async function sendManualReply(leadId, text) {
   return updateLead(leadId, {
     "Pending Reply": text,
