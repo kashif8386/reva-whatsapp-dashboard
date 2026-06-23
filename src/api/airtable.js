@@ -88,7 +88,7 @@ function mapLeadRecord(record) {
 
 export async function fetchMessagesForLead(leadId) {
   if (!leadId) return [];
-  const filterFormula = `SEARCH('${leadId}', ARRAYJOIN({Lead}))`;
+  const filterFormula = `{Lead Record ID} = '${leadId}'`;
   let records = [];
   let offset;
   do {
