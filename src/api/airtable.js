@@ -88,7 +88,7 @@ function mapLeadRecord(record) {
 
 export async function fetchMessagesForLead(leadId) {
   if (!leadId) return [];
-  const filterFormula = `{Lead Record ID} = '${leadId}'`;
+ const filterFormula = `{Lead ID} = '${leadId}'`;
   let records = [];
   let offset;
   do {
