@@ -211,24 +211,6 @@ export default function ChatThread({
             onChange={handleFileSelect}
           />
 
-          {/* Paperclip button */}
-          <button
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            disabled={isLoading}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "#94a3b8",
-              padding: "0 8px",
-              display: "flex",
-              alignItems: "center",
-            }}
-            title="Attach image"
-          >
-            <Paperclip size={18} />
-          </button>
-
           <input
             value={reply}
             onChange={(e) => setReply(e.target.value)}
@@ -236,6 +218,18 @@ export default function ChatThread({
             placeholder={imageFile ? "Add a caption (optional)..." : "Type a reply to send on WhatsApp..."}
             disabled={isLoading}
           />
+
+          {/* Paperclip button — same style as send button */}
+          <button
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            disabled={isLoading}
+            className="reva-send-btn"
+            style={{ background: imageFile ? "#ff634e" : "#cbd5e1", marginRight: 6 }}
+            title="Attach image"
+          >
+            <Paperclip size={17} />
+          </button>
+
           <button
             className="reva-send-btn"
             onClick={handleSend}
