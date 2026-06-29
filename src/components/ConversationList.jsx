@@ -62,6 +62,9 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
   const [search, setSearch] = useState("");
   const [activeLabel, setActiveLabel] = useState(null);
   const tabsRef = useRef(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollStart = useRef(0);
 
   // Allow horizontal scrolling with mouse wheel on desktop
   useEffect(() => {
@@ -75,6 +78,31 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
+
+  // Drag to scroll on desktop
+  const onMouseDown = (e) => {
+    isDragging.current = true;
+    startX.current = e.pageX - tabsRef.current.offsetLeft;
+    scrollStart.current = tabsRef.current.scrollLeft;
+    tabsRef.current.style.cursor = "grabbing";
+    tabsRef.current.style.userSelect = "none";
+  };
+
+  const onMouseMove = (e) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    const x = e.pageX - tabsRef.current.offsetLeft;
+    const walk = x - startX.current;
+    tabsRef.current.scrollLeft = scrollStart.current - walk;
+  };
+
+  const onMouseUp = () => {
+    isDragging.current = false;
+    if (tabsRef.current) {
+      tabsRef.current.style.cursor = "grab";
+      tabsRef.current.style.userSelect = "";
+    }
+  };
 
   const allLabels = useMemo(() => {
     return leads
@@ -145,7 +173,14 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
         scrollbarWidth: "none",
         msOverflowStyle: "none",
         WebkitOverflowScrolling: "touch",
-      }} ref={tabsRef}>
+        cursor: "grab",
+      }}
+        ref={tabsRef}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+      >
         {/* All tab */}
         <button
           onClick={() => setActiveLabel(null)}
