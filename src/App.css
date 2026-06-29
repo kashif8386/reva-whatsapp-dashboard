@@ -24,8 +24,8 @@ body {
 /* ---- Sidebar ---- */
 
 .reva-sidebar-wrap {
-  width: 360px;
-  min-width: 360px;
+  width: 420px;
+  min-width: 420px;
   border-right: 1px solid var(--reva-border);
   display: flex;
   flex-direction: column;
