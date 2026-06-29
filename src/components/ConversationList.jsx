@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Search, User, X } from "lucide-react";
+import { Search, User } from "lucide-react";
 import Avatar from "./Avatar";
 
 const AVATAR_COLORS = ["#ff634e", "#0F6E56", "#534AB7", "#993C1D", "#185FA5", "#854F0B"];
@@ -18,43 +18,41 @@ function formatTime(iso) {
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
-// Label colors matching the AI's label categories
-const LABEL_COLORS = {
-  READY_TO_BUY:       { bg: "#dcfce7", text: "#166534", dot: "#22c55e" },
-  GIFT_BUYER:         { bg: "#fef9c3", text: "#854d0e", dot: "#eab308" },
-  EXPLORING:          { bg: "#f1f5f9", text: "#475569", dot: "#94a3b8" },
-  NEEDS_CONSULTATION: { bg: "#ede9fe", text: "#5b21b6", dot: "#8b5cf6" },
-  EXISTING_CUSTOMER:  { bg: "#dbeafe", text: "#1e40af", dot: "#3b82f6" },
-  ORDER_FOLLOWUP:     { bg: "#ffedd5", text: "#9a3412", dot: "#f97316" },
-  NOT_INTERESTED:     { bg: "#fee2e2", text: "#991b1b", dot: "#ef4444" },
-  JOB_INQUIRY:        { bg: "#f0fdf4", text: "#166534", dot: "#4ade80" },
-  OUTSIDE_COVERAGE:   { bg: "#fce7f3", text: "#9d174d", dot: "#ec4899" },
-  FOLLOW_UP:          { bg: "#fff7ed", text: "#9a3412", dot: "#fb923c" },
+const LABEL_STYLES = {
+  READY_TO_BUY:       { color: "#16a34a", bg: "#dcfce7", activeBg: "#16a34a" },
+  GIFT_BUYER:         { color: "#d97706", bg: "#fef3c7", activeBg: "#d97706" },
+  EXPLORING:          { color: "#64748b", bg: "#f1f5f9", activeBg: "#64748b" },
+  NEEDS_CONSULTATION: { color: "#7c3aed", bg: "#ede9fe", activeBg: "#7c3aed" },
+  EXISTING_CUSTOMER:  { color: "#2563eb", bg: "#dbeafe", activeBg: "#2563eb" },
+  ORDER_FOLLOWUP:     { color: "#ea580c", bg: "#ffedd5", activeBg: "#ea580c" },
+  NOT_INTERESTED:     { color: "#dc2626", bg: "#fee2e2", activeBg: "#dc2626" },
+  JOB_INQUIRY:        { color: "#059669", bg: "#d1fae5", activeBg: "#059669" },
+  OUTSIDE_COVERAGE:   { color: "#db2777", bg: "#fce7f3", activeBg: "#db2777" },
+  FOLLOW_UP:          { color: "#c2410c", bg: "#fff7ed", activeBg: "#c2410c" },
 };
 
-function getLabelColor(label) {
-  if (!label) return null;
+function getLabelStyle(label) {
+  if (!label) return { color: "#64748b", bg: "#f1f5f9", activeBg: "#64748b" };
   const key = label.toUpperCase().replace(/\s+/g, "_");
-  return LABEL_COLORS[key] || { bg: "#f1f5f9", text: "#475569", dot: "#94a3b8" };
+  return LABEL_STYLES[key] || { color: "#64748b", bg: "#f1f5f9", activeBg: "#64748b" };
 }
 
-function LabelPill({ label, small }) {
-  const colors = getLabelColor(label);
-  if (!colors) return null;
+function LabelPill({ label }) {
+  const style = getLabelStyle(label);
   return (
     <span style={{
       display: "inline-flex",
       alignItems: "center",
-      gap: 4,
-      background: colors.bg,
-      color: colors.text,
-      fontSize: small ? 10 : 11,
+      gap: 5,
+      background: style.bg,
+      color: style.color,
+      fontSize: 11,
       fontWeight: 500,
-      padding: small ? "2px 7px" : "3px 8px",
+      padding: "2px 8px",
       borderRadius: 999,
       whiteSpace: "nowrap",
     }}>
-      <span style={{ width: 6, height: 6, borderRadius: "50%", background: colors.dot, flexShrink: 0 }} />
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: style.color, flexShrink: 0 }} />
       {label.replace(/_/g, " ")}
     </span>
   );
@@ -64,23 +62,17 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
   const [search, setSearch] = useState("");
   const [activeLabel, setActiveLabel] = useState(null);
 
-  // Get unique labels from all leads
   const allLabels = useMemo(() => {
-    const labels = leads
+    return leads
       .map((l) => l.label)
       .filter(Boolean)
       .filter((v, i, a) => a.indexOf(v) === i)
       .sort();
-    return labels;
   }, [leads]);
 
   const filtered = useMemo(() => {
     let result = leads;
-    // Filter by active label
-    if (activeLabel) {
-      result = result.filter((l) => l.label === activeLabel);
-    }
-    // Filter by search
+    if (activeLabel) result = result.filter((l) => l.label === activeLabel);
     if (search.trim()) {
       const s = search.toLowerCase();
       result = result.filter(
@@ -95,6 +87,7 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
 
   return (
     <div className="reva-sidebar">
+      {/* Header */}
       <div className="reva-sidebar-header">
         <div className="reva-brand">
           <div className="reva-brand-mark">R</div>
@@ -105,131 +98,98 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
         </div>
       </div>
 
+      {/* Search */}
       <div className="reva-search-wrap">
         <div className="reva-search">
           <Search size={15} className="reva-search-icon" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, phone, or label"
+            placeholder="Search or filter by name"
           />
         </div>
       </div>
 
-      {/* Label filter bar */}
-      {allLabels.length > 0 && (
-        <div style={{
-          padding: "8px 12px",
-          borderBottom: "1px solid #f0f0f0",
-          display: "flex",
-          gap: 6,
-          flexWrap: "wrap",
-          background: "#fafafa",
-        }}>
-          {/* All button */}
-          <button
-            onClick={() => setActiveLabel(null)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
-              background: !activeLabel ? "#0a0a0a" : "#f1f5f9",
-              color: !activeLabel ? "#fff" : "#475569",
-              fontSize: 11,
-              fontWeight: 500,
-              padding: "3px 10px",
-              borderRadius: 999,
-              border: "none",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            All
-            <span style={{
-              background: !activeLabel ? "#ffffff33" : "#e2e8f0",
-              color: !activeLabel ? "#fff" : "#64748b",
-              fontSize: 10,
-              borderRadius: 999,
-              padding: "0 5px",
-              fontWeight: 600,
-            }}>
-              {leads.length}
-            </span>
-          </button>
+      {/* WhatsApp-style filter tabs */}
+      <div style={{
+        overflowX: "auto",
+        padding: "8px 12px",
+        display: "flex",
+        gap: 8,
+        borderBottom: "1px solid #ececec",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+      }}>
+        {/* All tab */}
+        <button
+          onClick={() => setActiveLabel(null)}
+          style={{
+            flexShrink: 0,
+            padding: "5px 14px",
+            borderRadius: 999,
+            border: !activeLabel ? "none" : "1.5px solid #e2e8f0",
+            background: !activeLabel ? "#ff634e" : "transparent",
+            color: !activeLabel ? "#fff" : "#64748b",
+            fontSize: 13,
+            fontWeight: 500,
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          All {leads.length > 0 && <span style={{ opacity: 0.8 }}>{leads.length}</span>}
+        </button>
 
-          {/* Label buttons */}
-          {allLabels.map((label) => {
-            const count = leads.filter((l) => l.label === label).length;
-            const colors = getLabelColor(label);
-            const isActive = activeLabel === label;
-            return (
-              <button
-                key={label}
-                onClick={() => setActiveLabel(isActive ? null : label)}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  background: isActive ? colors.text : colors.bg,
-                  color: isActive ? "#fff" : colors.text,
-                  fontSize: 11,
-                  fontWeight: 500,
-                  padding: "3px 8px",
-                  borderRadius: 999,
-                  border: "none",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span style={{
-                  width: 6, height: 6, borderRadius: "50%",
-                  background: isActive ? "#ffffff99" : colors.dot,
-                  flexShrink: 0,
-                }} />
-                {label.replace(/_/g, " ")}
-                <span style={{
-                  background: isActive ? "#ffffff33" : "#00000011",
-                  fontSize: 10,
-                  borderRadius: 999,
-                  padding: "0 5px",
-                  fontWeight: 600,
-                }}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-
-          {/* Clear filter indicator */}
-          {activeLabel && (
+        {/* Label tabs */}
+        {allLabels.map((label) => {
+          const style = getLabelStyle(label);
+          const isActive = activeLabel === label;
+          const count = leads.filter((l) => l.label === label).length;
+          return (
             <button
-              onClick={() => setActiveLabel(null)}
+              key={label}
+              onClick={() => setActiveLabel(isActive ? null : label)}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 3,
-                background: "transparent",
-                color: "#ff634e",
-                fontSize: 11,
-                fontWeight: 500,
-                padding: "3px 6px",
+                flexShrink: 0,
+                padding: "5px 14px",
                 borderRadius: 999,
-                border: "1px solid #ff634e",
+                border: isActive ? "none" : `1.5px solid ${style.color}33`,
+                background: isActive ? style.activeBg : style.bg,
+                color: isActive ? "#fff" : style.color,
+                fontSize: 13,
+                fontWeight: 500,
                 cursor: "pointer",
+                whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
               }}
             >
-              <X size={10} /> Clear
+              {label.replace(/_/g, " ")}
+              <span style={{
+                background: isActive ? "#ffffff33" : style.color + "22",
+                color: isActive ? "#fff" : style.color,
+                fontSize: 11,
+                fontWeight: 600,
+                borderRadius: 999,
+                padding: "1px 6px",
+                lineHeight: 1.4,
+              }}>
+                {count}
+              </span>
             </button>
-          )}
-        </div>
-      )}
+          );
+        })}
+      </div>
 
+      {/* Conversation list */}
       <div className="reva-list">
         {loading && <div className="reva-empty-state">Loading conversations…</div>}
         {error && <div className="reva-empty-state reva-error">{error}</div>}
         {!loading && !error && filtered.length === 0 && (
           <div className="reva-empty-state">
-            {activeLabel ? `No chats labeled "${activeLabel.replace(/_/g, " ")}"` : "No conversations found."}
+            {activeLabel
+              ? `No chats labeled "${activeLabel.replace(/_/g, " ")}"`
+              : "No conversations found."}
           </div>
         )}
         {filtered.map((lead) => (
@@ -245,7 +205,7 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
                 <span className="reva-list-item-time">{formatTime(lead.lastMessageAt)}</span>
               </div>
               <div className="reva-list-item-meta">
-                {lead.label && <LabelPill label={lead.label} small />}
+                {lead.label && <LabelPill label={lead.label} />}
                 {lead.humanTakeover && (
                   <span className="reva-takeover-tag">
                     <User size={11} /> You're handling this
