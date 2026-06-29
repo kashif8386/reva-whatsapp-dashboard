@@ -130,7 +130,7 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
             border: !activeLabel ? "none" : "1.5px solid #e2e8f0",
             background: !activeLabel ? "#ff634e" : "transparent",
             color: !activeLabel ? "#fff" : "#64748b",
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: 500,
             cursor: "pointer",
             whiteSpace: "nowrap",
@@ -150,12 +150,12 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
               onClick={() => setActiveLabel(isActive ? null : label)}
               style={{
                 flexShrink: 0,
-                padding: "5px 14px",
+                padding: "4px 10px",
                 borderRadius: 999,
                 border: isActive ? "none" : `1.5px solid ${style.color}33`,
                 background: isActive ? style.activeBg : style.bg,
                 color: isActive ? "#fff" : style.color,
-                fontSize: 13,
+                fontSize: 11,
                 fontWeight: 500,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
