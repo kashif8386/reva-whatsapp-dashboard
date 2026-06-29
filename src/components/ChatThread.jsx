@@ -224,7 +224,7 @@ export default function ChatThread({
             onClick={() => fileInputRef.current && fileInputRef.current.click()}
             disabled={isLoading}
             className="reva-send-btn"
-            style={{ background: imageFile ? "#ff634e" : "#cbd5e1", marginRight: 6 }}
+            style={{ background: "#ff634e", marginRight: 6 }}
             title="Attach image"
           >
             <Paperclip size={17} />
