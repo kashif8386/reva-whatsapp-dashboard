@@ -7,10 +7,21 @@ function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
+function isImageUrl(text) {
+  if (!text) return false;
+  const cleaned = text.trim();
+  return (
+    cleaned.includes('res.cloudinary.com') ||
+    cleaned.includes('lookaside.fbsbx.com') ||
+    /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(cleaned)
+  );
+}
+
 function MessageBubble({ msg }) {
   const isCustomer = msg.sender === "customer";
   const isAI = msg.sender === "ai agent" || msg.sender === "ai";
   const isClient = msg.sender === "client";
+  const isImage = isImageUrl(msg.text);
 
   return (
     <div className={`reva-bubble-row ${isCustomer ? "from-customer" : "from-us"}`}>
@@ -20,8 +31,33 @@ function MessageBubble({ msg }) {
           <span>{isAI ? "AI Agent" : "You (Parfumea)"}</span>
         </div>
       )}
-      <div className={`reva-bubble ${isCustomer ? "bubble-customer" : isAI ? "bubble-ai" : "bubble-client"}`}>
-        {msg.text}
+      <div
+        className={`reva-bubble ${isCustomer ? "bubble-customer" : isAI ? "bubble-ai" : "bubble-client"}`}
+        style={isImage ? { padding: 4, background: "transparent", boxShadow: "none" } : {}}
+      >
+        {isImage ? (
+          <>
+            <img
+              src={msg.text.trim()}
+              alt="Shared image"
+              style={{
+                maxWidth: 240,
+                maxHeight: 240,
+                borderRadius: 10,
+                display: "block",
+                cursor: "pointer",
+              }}
+              onClick={() => window.open(msg.text.trim(), "_blank")}
+              onError={(e) => {
+                e.target.style.display = "none";
+                e.target.nextSibling.style.display = "block";
+              }}
+            />
+            <span style={{ display: "none", fontSize: 13, color: "#999" }}>📷 Image (unavailable)</span>
+          </>
+        ) : (
+          msg.text
+        )}
       </div>
       <div className="reva-bubble-time">
         {formatTime(msg.timestamp)}
