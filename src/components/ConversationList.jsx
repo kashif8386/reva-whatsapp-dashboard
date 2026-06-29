@@ -111,14 +111,26 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
       </div>
 
       {/* WhatsApp-style filter tabs */}
+      <div style={{ position: "relative", borderBottom: "1px solid #ececec" }}>
+        {/* Fade hint on right edge */}
+        <div style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: 32,
+          background: "linear-gradient(to right, transparent, #fff)",
+          pointerEvents: "none",
+          zIndex: 1,
+        }} />
       <div style={{
         overflowX: "auto",
         padding: "8px 12px",
         display: "flex",
-        gap: 8,
-        borderBottom: "1px solid #ececec",
+        gap: 6,
         scrollbarWidth: "none",
         msOverflowStyle: "none",
+        WebkitOverflowScrolling: "touch",
       }}>
         {/* All tab */}
         <button
@@ -179,6 +191,7 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
             </button>
           );
         })}
+      </div>
       </div>
 
       {/* Conversation list */}
