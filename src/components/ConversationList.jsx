@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Search, User } from "lucide-react";
 import Avatar from "./Avatar";
 
@@ -61,6 +61,20 @@ function LabelPill({ label }) {
 export default function ConversationList({ leads, activeId, onSelect, loading, error }) {
   const [search, setSearch] = useState("");
   const [activeLabel, setActiveLabel] = useState(null);
+  const tabsRef = useRef(null);
+
+  // Allow horizontal scrolling with mouse wheel on desktop
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const onWheel = (e) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
 
   const allLabels = useMemo(() => {
     return leads
@@ -131,7 +145,7 @@ export default function ConversationList({ leads, activeId, onSelect, loading, e
         scrollbarWidth: "none",
         msOverflowStyle: "none",
         WebkitOverflowScrolling: "touch",
-      }}>
+      }} ref={tabsRef}>
         {/* All tab */}
         <button
           onClick={() => setActiveLabel(null)}
